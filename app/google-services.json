@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "995822665794",
+    "project_id": "alphaplayer-912fc",
+    "storage_bucket": "alphaplayer-912fc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:995822665794:android:b535e0ad0074032bbe6ddb",
+        "android_client_info": {
+          "package_name": "com.example.alphaplayer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgnnFBoiyZ-5MSJeqoiX7-gZQgpY4TxkI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
