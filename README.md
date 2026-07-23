@@ -125,7 +125,7 @@ app
 ### Clone Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/AlphaPlayer.git
+https://github.com/suryakushwaha3/Alpha_Player
 ```
 
 ### Open Project
