@@ -7,5 +7,7 @@ plugins {
     //plugin for navigation
     kotlin("jvm") version "2.2.10"
     kotlin("plugin.serialization") version "2.2.10"
-    alias(libs.plugins.google.gms.google.services) apply false
+
+
+    id("com.google.gms.google-services") version "4.5.0" apply false
 }
