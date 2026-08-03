@@ -3,6 +3,7 @@ package com.example.alphaplayer.ui.screens.watchlist
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,7 +57,7 @@ fun WatchlistScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF0F0F14),
+                        Color(0xFF0B0B0E),
                         Color.Black
                     )
                 )
@@ -68,7 +69,7 @@ fun WatchlistScreen(
             )
     ) {
         // ---------------------------------------------------------------------
-        // Attractive Top Header Section (Without Count Box)
+        // Attractive Top Header Section
         // ---------------------------------------------------------------------
         Row(
             modifier = Modifier
@@ -79,11 +80,10 @@ fun WatchlistScreen(
         ) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Sleek History Accent Icon
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .size(36.dp)
+                            .clip(RoundedCornerShape(10.dp))
                             .background(Color(0xFFE50914).copy(alpha = 0.15f)),
                         contentAlignment = Alignment.Center
                     ) {
@@ -95,7 +95,7 @@ fun WatchlistScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
 
                     Text(
                         text = "Recently Watched",
@@ -105,12 +105,12 @@ fun WatchlistScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = "Continue where you left off",
-                    color = Color.Gray.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
+                    color = Color.Gray.copy(alpha = 0.9f),
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Normal
                 )
             }
@@ -120,14 +120,14 @@ fun WatchlistScreen(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White.copy(alpha = 0.08f))
+                        .background(Color.White.copy(alpha = 0.05f))
                         .border(
                             width = 1.dp,
-                            color = Color(0xFFE50914).copy(alpha = 0.4f),
+                            color = Color(0xFFE50914).copy(alpha = 0.3f),
                             shape = RoundedCornerShape(20.dp)
                         )
                         .clickable { WatchlistManager.clearWatchlist() }
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .padding(horizontal = 14.dp, vertical = 8.dp)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -142,7 +142,7 @@ fun WatchlistScreen(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Clear",
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = Color.White,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -168,18 +168,19 @@ fun WatchlistScreen(
                         modifier = Modifier
                             .size(80.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF1A1A22)),
+                            .background(Color(0xFF141419))
+                            .border(1.dp, Color(0xFF22222D), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
                             contentDescription = "Empty History",
-                            tint = Color.Gray,
-                            modifier = Modifier.size(40.dp)
+                            tint = Color(0xFFE50914).copy(alpha = 0.7f),
+                            modifier = Modifier.size(38.dp)
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
                     Text(
                         text = "Your Watchlist is Empty",
@@ -205,8 +206,8 @@ fun WatchlistScreen(
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 20.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(
                         items = watchedMovies,
@@ -249,7 +250,7 @@ fun WatchlistScreen(
 }
 
 // -----------------------------------------------------------------------------
-// Horizontal List Row Item
+// Horizontal List Row Item (Professional OTT Style)
 // -----------------------------------------------------------------------------
 @Composable
 fun WatchlistItemRow(
@@ -257,79 +258,122 @@ fun WatchlistItemRow(
     onMovieClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF181820))
-            .clickable { onMovieClick() }
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .clip(RoundedCornerShape(14.dp))
+            .clickable { onMovieClick() },
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF141419)),
+        border = BorderStroke(1.dp, Color(0xFF22222D)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        // Thumbnail Image
-        Box(
+        Row(
             modifier = Modifier
-                .size(width = 80.dp, height = 50.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFF262632)),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (!movie.logo.isNullOrEmpty()) {
-                AsyncImage(
-                    model = movie.logo,
-                    contentDescription = movie.title,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+            // Thumbnail Image with Play Overlay
+            Box(
+                modifier = Modifier
+                    .size(width = 90.dp, height = 56.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFF1C1C24)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!movie.logo.isNullOrEmpty()) {
+                    AsyncImage(
+                        model = movie.logo,
+                        contentDescription = movie.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.Gray,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                // Semi-transparent play badge overlay
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color.Black.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = "Play",
+                        tint = Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.formatHorizontalSpacer()) // Standard gap replacement
+
+            // Title & Info Section
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+            ) {
+                Text(
+                    text = movie.title,
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-            } else {
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFE50914))
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = movie.group?.takeIf { it.isNotBlank() } ?: "Stream",
+                        color = Color.Gray,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Delete Button (Glass Circle)
+            IconButton(
+                onClick = onDeleteClick,
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha =.05f))
+            ) {
                 Icon(
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = null,
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Remove",
                     tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
         }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        // Title & Info
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = movie.title,
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            Text(
-                text = movie.group?.takeIf { it.isNotBlank() } ?: "Stream",
-                color = Color.Gray,
-                fontSize = 11.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Delete Button
-        IconButton(
-            onClick = onDeleteClick,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Remove",
-                tint = Color.Gray,
-                modifier = Modifier.size(18.dp)
-            )
-        }
     }
 }
+
+// Helper extension or standard modifier spacer
+@Composable
+private fun Modifier.formatHorizontalSpacer() = this.then(Modifier.width(12.dp))

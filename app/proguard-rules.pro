@@ -37,3 +37,32 @@
  # ===================================================================
  -keep class com.example.alphaplayer.viewmodel.** { *; }
  -keep class com.example.alphaplayer.ui.navigation.** { *; }
+
+ # ===================================================================
+ # 5. DATA MODELS & KOTLINX SERIALIZATION (Added to fix text missing issue)
+ # ===================================================================
+ -keep class com.example.alphaplayer.data.model.** { *; }
+ -keepclassmembers class com.example.alphaplayer.data.model.** {
+     *;
+ }
+ -keepclassmembers class * {
+     @kotlinx.serialization.Serializable <fields>;
+ }
+ -keep class kotlinx.serialization.** { *; }
+ -dontwarn kotlinx.serialization.**
+
+ # ===================================================================
+ # 6. FIX: GOOGLE PLAY SERVICES & BROKER SECURITY EXCEPTION
+ # ===================================================================
+ -keep class com.google.android.gms.** { *; }
+ -keep class com.google.common.** { *; }
+ -dontwarn com.google.android.gms.**
+ -dontwarn com.google.common.**
+
+ -keep class * implements android.os.Parcelable {
+     public static final android.os.Parcelable$Creator *;
+ }
+
+ -keep public class * extends android.os.Binder { *; }
+ -keep public class * extends android.os.IInterface { *; }
+ -keep interface android.os.IBinder { *; }

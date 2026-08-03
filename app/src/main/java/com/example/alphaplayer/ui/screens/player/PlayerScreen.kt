@@ -1,10 +1,14 @@
+//
 //package com.example.alphaplayer.ui.screens.player
 //
 //import android.content.Context
+//import android.content.Intent
 //import android.content.pm.ActivityInfo
 //import android.content.res.Configuration
 //import android.media.AudioManager
+//import android.net.Uri
 //import android.view.ViewGroup
+//import android.widget.Toast
 //import androidx.activity.ComponentActivity
 //import androidx.activity.compose.BackHandler
 //import androidx.compose.animation.AnimatedVisibility
@@ -32,6 +36,7 @@
 //import androidx.compose.material.icons.Icons
 //import androidx.compose.material.icons.automirrored.filled.ArrowBack
 //import androidx.compose.material.icons.filled.ClosedCaption
+//import androidx.compose.material.icons.filled.Download
 //import androidx.compose.material.icons.filled.Fullscreen
 //import androidx.compose.material.icons.filled.FullscreenExit
 //import androidx.compose.material.icons.filled.Pause
@@ -85,6 +90,7 @@
 //import androidx.lifecycle.LifecycleEventObserver
 //import androidx.media3.common.C
 //import androidx.media3.common.MediaItem
+//import androidx.media3.common.MimeTypes
 //import androidx.media3.common.PlaybackException
 //import androidx.media3.common.Player
 //import androidx.media3.common.TrackSelectionOverride
@@ -93,6 +99,7 @@
 //import androidx.media3.datasource.DefaultHttpDataSource
 //import androidx.media3.exoplayer.DefaultLoadControl
 //import androidx.media3.exoplayer.ExoPlayer
+//import androidx.media3.exoplayer.source.ProgressiveMediaSource
 //import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 //import androidx.media3.ui.AspectRatioFrameLayout
 //import androidx.media3.ui.PlayerView
@@ -101,6 +108,40 @@
 //import java.util.concurrent.TimeUnit
 //import kotlin.math.max
 //import kotlin.math.min
+//
+//// Helper function: M3U Pipe Format URL & Headers Parsing Logic
+//private fun parseM3uUrl(rawUrl: String): Pair<String, Map<String, String>> {
+//    val headers = mutableMapOf<String, String>()
+//    if (rawUrl.contains("|")) {
+//        val parts = rawUrl.split("|")
+//        val cleanUrl = parts[0].trim()
+//
+//        for (i in 1 until parts.size) {
+//            val headerPair = parts[i].split("=")
+//            if (headerPair.size == 2) {
+//                headers[headerPair[0].trim()] = headerPair[1].trim()
+//            }
+//        }
+//        return Pair(cleanUrl, headers)
+//    }
+//    return Pair(rawUrl.trim(), headers)
+//}
+//
+//private fun openInBrowser(context: Context, url: String) {
+//    try {
+//        val cleanUrl = if (url.contains("|")) url.substringBefore("|") else url
+//        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(cleanUrl))
+//        context.startActivity(intent)
+//    } catch (e: Exception) {
+//        Toast.makeText(context, "Cannot open URL", Toast.LENGTH_SHORT).show()
+//    }
+//}
+//
+//private fun formatTime(millis: Long): String {
+//    val minutes = TimeUnit.MILLISECONDS.toMinutes(millis)
+//    val seconds = TimeUnit.MILLISECONDS.toSeconds(millis) - TimeUnit.MINUTES.toSeconds(minutes)
+//    return String.format("%02d:%02d", minutes, seconds)
+//}
 //
 //@androidx.annotation.OptIn(UnstableApi::class)
 //@OptIn(ExperimentalMaterial3Api::class)
@@ -111,19 +152,20 @@
 //    navController: NavController,
 //    headersJson: String? = null
 //) {
-//    val headers = remember(headersJson) {
-//        if (headersJson == null) null
+//    val context = LocalContext.current
+//    val activity = context as? ComponentActivity
+//    val configuration = LocalConfiguration.current
+//    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+//    val lifecycleOwner = LocalLifecycleOwner.current
+//
+//    val passedHeaders = remember(headersJson) {
+//        if (headersJson.isNullOrEmpty()) null
 //        else try {
 //            kotlinx.serialization.json.Json.decodeFromString<Map<String, String>>(headersJson)
 //        } catch (e: Exception) {
 //            null
 //        }
 //    }
-//    val context = LocalContext.current
-//    val activity = context as? ComponentActivity
-//    val configuration = LocalConfiguration.current
-//    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-//    val lifecycleOwner = LocalLifecycleOwner.current
 //
 //    LaunchedEffect(Unit) {
 //        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
@@ -162,48 +204,66 @@
 //            .build()
 //    }
 //
-//    val exoPlayer = remember(url, headers) {
-//        val targetUrl = url.trim()
+//    val exoPlayer = remember(url, passedHeaders) {
+//        // Parse Pipe Separated M3U URL + Headers
+//        val (cleanUrl, parsedPipeHeaders) = parseM3uUrl(url)
 //
 //        val httpDataSourceFactory = DefaultHttpDataSource.Factory().apply {
-//            val userAgent = headers?.get("User-Agent") ?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+//            val userAgent = parsedPipeHeaders["User-Agent"]
+//                ?: passedHeaders?.get("User-Agent")
+//                ?: passedHeaders?.get("user-agent")
+//                ?: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+//
 //            setUserAgent(userAgent)
+//            setAllowCrossProtocolRedirects(true)
 //
 //            val requestProperties = mutableMapOf<String, String>()
 //
-//            // Dynamic Referer Binding
-//            requestProperties["Referer"] = headers?.get("Referer") ?: when {
-//                targetUrl.contains("github") -> "https://github.com/"
-//                targetUrl.contains("fibwatch") -> "https://fibwatch.art/"
-//                else -> "https://google.com/"
-//            }
+//            requestProperties["Accept"] = "*/*"
+//            requestProperties["Accept-Language"] = "en-US,en;q=0.9"
+//            requestProperties["Connection"] = "keep-alive"
 //
-//            headers?.forEach { (key, value) ->
-//                if (key != "User-Agent" && key != "Referer") {
-//                    requestProperties[key] = value
+//            // Exact referer detection
+//            val refererVal = parsedPipeHeaders["Referer"]
+//                ?: passedHeaders?.get("Referer")
+//                ?: passedHeaders?.get("referer")
+//                ?: when {
+//                    cleanUrl.contains("fibwatch") -> "https://fibwatch.art/"
+//                    cleanUrl.contains("b-cdn.net") -> "https://fibwatch.art/"
+//                    else -> "https://google.com/"
 //                }
-//            }
+//
+//            requestProperties["Referer"] = refererVal
+//            requestProperties["Origin"] = refererVal.trimEnd('/')
+//
+//            // Merge passed headers and pipe headers
+//            passedHeaders?.forEach { (k, v) -> requestProperties[k] = v }
+//            parsedPipeHeaders.forEach { (k, v) -> requestProperties[k] = v }
+//
 //            setDefaultRequestProperties(requestProperties)
 //        }
 //
-//        val mediaSourceFactory = DefaultMediaSourceFactory(context)
-//            .setDataSourceFactory(httpDataSourceFactory)
+//        // Determine MediaSource type (MKV / Progressive vs HLS M3U8)
+//        val mediaItemBuilder = MediaItem.Builder().setUri(cleanUrl)
+//        val mediaSource = if (cleanUrl.endsWith(".mkv", ignoreCase = true) || cleanUrl.endsWith(".mp4", ignoreCase = true)) {
+//            ProgressiveMediaSource.Factory(httpDataSourceFactory)
+//                .createMediaSource(mediaItemBuilder.build())
+//        } else {
+//            if (cleanUrl.contains(".m3u8", ignoreCase = true)) {
+//                mediaItemBuilder.setMimeType(MimeTypes.APPLICATION_M3U8)
+//            }
+//            DefaultMediaSourceFactory(context)
+//                .setDataSourceFactory(httpDataSourceFactory)
+//                .createMediaSource(mediaItemBuilder.build())
+//        }
 //
 //        ExoPlayer.Builder(context)
-//            .setMediaSourceFactory(mediaSourceFactory)
 //            .setLoadControl(loadControl)
 //            .setSeekBackIncrementMs(10000)
 //            .setSeekForwardIncrementMs(10000)
 //            .build()
 //            .apply {
-//                val finalVideoUri = if (targetUrl.contains("|Referer=")) {
-//                    targetUrl.substringBefore("|")
-//                } else {
-//                    targetUrl
-//                }
-//
-//                val mediaItem = MediaItem.Builder().setUri(finalVideoUri).build()
-//                setMediaItem(mediaItem)
+//                setMediaSource(mediaSource)
 //
 //                if (savedPlaybackPositionMs > 0L) {
 //                    seekTo(savedPlaybackPositionMs)
@@ -217,6 +277,7 @@
 //                addListener(object : Player.Listener {
 //                    override fun onPlayerError(error: PlaybackException) {
 //                        error.printStackTrace()
+//                        Toast.makeText(context, "Playback Error: ${error.localizedMessage}", Toast.LENGTH_LONG).show()
 //                    }
 //
 //                    override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -321,7 +382,7 @@
 //                }
 //            )
 //
-//            // Brightness & Volume Vertical Gesture Drivers
+//            // Brightness & Volume Gestures
 //            Row(modifier = Modifier.fillMaxSize()) {
 //                Box(
 //                    modifier = Modifier
@@ -358,7 +419,7 @@
 //                )
 //            }
 //
-//            // Tap Overlay to Toggle Player Controls
+//            // Tap Overlay
 //            Box(
 //                modifier = Modifier
 //                    .fillMaxSize()
@@ -394,7 +455,8 @@
 //                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
 //                                containerColor = Color.Transparent,
 //                                titleContentColor = Color.White,
-//                                navigationIconContentColor = Color.White
+//                                navigationIconContentColor = Color.White,
+//                                actionIconContentColor = Color.White
 //                            ),
 //                            title = {
 //                                Text(
@@ -410,11 +472,19 @@
 //                                        contentDescription = "Back"
 //                                    )
 //                                }
+//                            },
+//                            actions = {
+//                                IconButton(onClick = { openInBrowser(context, url) }) {
+//                                    Icon(
+//                                        imageVector = Icons.Default.Download,
+//                                        contentDescription = "Download Movie"
+//                                    )
+//                                }
 //                            }
 //                        )
 //                    }
 //
-//                    // CENTER RED PLAY/PAUSE BUTTON
+//                    // CENTER PLAY/PAUSE
 //                    Box(
 //                        modifier = Modifier
 //                            .align(Alignment.Center)
@@ -450,7 +520,6 @@
 //                            )
 //                            .navigationBarsPadding()
 //                    ) {
-//                        // ULTRA-THIN CUSTOM TRACK SEEKBAR
 //                        Slider(
 //                            value = currentPositionMs.toFloat(),
 //                            onValueChange = { newPos ->
@@ -482,7 +551,6 @@
 //                                .padding(horizontal = 12.dp)
 //                        )
 //
-//                        // CONTROLS ROW
 //                        Row(
 //                            modifier = Modifier
 //                                .fillMaxWidth()
@@ -683,57 +751,18 @@
 //
 //                        TextButton(
 //                            onClick = {
-//                                isSubtitlesEnabled = false
+//                                isSubtitlesEnabled = !isSubtitlesEnabled
 //                                exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters
 //                                    .buildUpon()
-//                                    .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
+//                                    .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, !isSubtitlesEnabled)
 //                                    .build()
 //                                showSubtitleSheet = false
-//                            },
-//                            modifier = Modifier.fillMaxWidth()
+//                            }
 //                        ) {
-//                            Row(
-//                                modifier = Modifier.fillMaxWidth(),
-//                                horizontalArrangement = Arrangement.Start
-//                            ) {
-//                                Text(
-//                                    text = "Off",
-//                                    color = if (!isSubtitlesEnabled) Color.Red else Color.White
-//                                )
-//                            }
-//                        }
-//
-//                        currentTracks?.groups?.filter { it.type == C.TRACK_TYPE_TEXT }?.forEach { group ->
-//                            for (i in 0 until group.length) {
-//                                val format = group.getTrackFormat(i)
-//                                val label = format.label ?: format.language ?: "Subtitle ${i + 1}"
-//                                val isSelected = group.isTrackSelected(i) && isSubtitlesEnabled
-//
-//                                TextButton(
-//                                    onClick = {
-//                                        isSubtitlesEnabled = true
-//                                        exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters
-//                                            .buildUpon()
-//                                            .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
-//                                            .setOverrideForType(
-//                                                TrackSelectionOverride(group.mediaTrackGroup, i)
-//                                            )
-//                                            .build()
-//                                        showSubtitleSheet = false
-//                                    },
-//                                    modifier = Modifier.fillMaxWidth()
-//                                ) {
-//                                    Row(
-//                                        modifier = Modifier.fillMaxWidth(),
-//                                        horizontalArrangement = Arrangement.Start
-//                                    ) {
-//                                        Text(
-//                                            text = label,
-//                                            color = if (isSelected) Color.Red else Color.White
-//                                        )
-//                                    }
-//                                }
-//                            }
+//                            Text(
+//                                text = if (isSubtitlesEnabled) "Disable Captions" else "Enable Captions",
+//                                color = Color.Red
+//                            )
 //                        }
 //                    }
 //                }
@@ -741,23 +770,11 @@
 //        }
 //    }
 //}
-//
-//// Helper to format Milliseconds into HH:MM:SS or MM:SS
-//private fun formatTime(timeMs: Long): String {
-//    val totalSeconds = timeMs / 1000
-//    val seconds = totalSeconds % 60
-//    val minutes = (totalSeconds / 60) % 60
-//    val hours = totalSeconds / 3600
-//
-//    return if (hours > 0) {
-//        String.format("%02d:%02d:%02d", hours, minutes, seconds)
-//    } else {
-//        String.format("%02d:%02d", minutes, seconds)
-//    }
-//}}
 
 package com.example.alphaplayer.ui.screens.player
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -793,7 +810,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ClosedCaption
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Fullscreen
 import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.Pause
@@ -856,8 +873,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.DefaultLoadControl
 import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
@@ -884,13 +902,16 @@ private fun parseM3uUrl(rawUrl: String): Pair<String, Map<String, String>> {
     return Pair(rawUrl.trim(), headers)
 }
 
-private fun openInBrowser(context: Context, url: String) {
+// Direct Download Link Copy Logic
+private fun copyLinkToClipboard(context: Context, url: String) {
     try {
         val cleanUrl = if (url.contains("|")) url.substringBefore("|") else url
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(cleanUrl))
-        context.startActivity(intent)
+        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Download Link", cleanUrl)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(context, "Download link copied to clipboard!", Toast.LENGTH_SHORT).show()
     } catch (e: Exception) {
-        Toast.makeText(context, "Cannot open URL", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Failed to copy link", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -962,7 +983,6 @@ fun PlayerScreen(
     }
 
     val exoPlayer = remember(url, passedHeaders) {
-        // Parse Pipe Separated M3U URL + Headers
         val (cleanUrl, parsedPipeHeaders) = parseM3uUrl(url)
 
         val httpDataSourceFactory = DefaultHttpDataSource.Factory().apply {
@@ -980,7 +1000,6 @@ fun PlayerScreen(
             requestProperties["Accept-Language"] = "en-US,en;q=0.9"
             requestProperties["Connection"] = "keep-alive"
 
-            // Exact referer detection
             val refererVal = parsedPipeHeaders["Referer"]
                 ?: passedHeaders?.get("Referer")
                 ?: passedHeaders?.get("referer")
@@ -993,14 +1012,12 @@ fun PlayerScreen(
             requestProperties["Referer"] = refererVal
             requestProperties["Origin"] = refererVal.trimEnd('/')
 
-            // Merge passed headers and pipe headers
             passedHeaders?.forEach { (k, v) -> requestProperties[k] = v }
             parsedPipeHeaders.forEach { (k, v) -> requestProperties[k] = v }
 
             setDefaultRequestProperties(requestProperties)
         }
 
-        // Determine MediaSource type (MKV / Progressive vs HLS M3U8)
         val mediaItemBuilder = MediaItem.Builder().setUri(cleanUrl)
         val mediaSource = if (cleanUrl.endsWith(".mkv", ignoreCase = true) || cleanUrl.endsWith(".mp4", ignoreCase = true)) {
             ProgressiveMediaSource.Factory(httpDataSourceFactory)
@@ -1231,10 +1248,10 @@ fun PlayerScreen(
                                 }
                             },
                             actions = {
-                                IconButton(onClick = { openInBrowser(context, url) }) {
+                                IconButton(onClick = { copyLinkToClipboard(context, url) }) {
                                     Icon(
-                                        imageVector = Icons.Default.Download,
-                                        contentDescription = "Download Movie"
+                                        imageVector = Icons.Default.ContentCopy,
+                                        contentDescription = "Copy Download Link"
                                     )
                                 }
                             }
@@ -1483,11 +1500,12 @@ fun PlayerScreen(
                                 }
                             }
                         }
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
             }
 
-            // SUBTITLE TRACK SELECTION SHEET
+            // SUBTITLE / TRACK SELECTION SHEET
             if (showSubtitleSheet) {
                 ModalBottomSheet(
                     onDismissRequest = { showSubtitleSheet = false },
@@ -1500,27 +1518,60 @@ fun PlayerScreen(
                             .padding(24.dp)
                     ) {
                         Text(
-                            text = "Captions / Subtitles",
+                            text = "Subtitles & Audio Tracks",
                             color = Color.White,
                             style = androidx.compose.material3.MaterialTheme.typography.titleMedium
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
                         TextButton(
                             onClick = {
                                 isSubtitlesEnabled = !isSubtitlesEnabled
-                                exoPlayer.trackSelectionParameters = exoPlayer.trackSelectionParameters
-                                    .buildUpon()
-                                    .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, !isSubtitlesEnabled)
-                                    .build()
+                                val trackSelector = exoPlayer.trackSelector as? DefaultTrackSelector
+                                if (trackSelector != null) {
+                                    val parametersBuilder = trackSelector.buildUponParameters()
+                                        .setRendererDisabled(C.TRACK_TYPE_TEXT, !isSubtitlesEnabled)
+                                    trackSelector.setParameters(parametersBuilder)
+                                }
                                 showSubtitleSheet = false
                             }
                         ) {
                             Text(
-                                text = if (isSubtitlesEnabled) "Disable Captions" else "Enable Captions",
-                                color = Color.Red
+                                text = if (isSubtitlesEnabled) "Disable Subtitles" else "Enable Subtitles",
+                                color = Color.White
                             )
                         }
+
+                        currentTracks?.groups?.forEach { group ->
+                            if (group.type == C.TRACK_TYPE_TEXT || group.type == C.TRACK_TYPE_AUDIO) {
+                                val trackTypeStr = if (group.type == C.TRACK_TYPE_TEXT) "Subtitle" else "Audio"
+                                for (i in 0 until group.length) {
+                                    val format = group.getTrackFormat(i)
+                                    val trackName = format.label ?: format.language ?: "$trackTypeStr ${i + 1}"
+                                    val isSelected = group.isTrackSelected(i)
+
+                                    TextButton(
+                                        onClick = {
+                                            val trackSelector = exoPlayer.trackSelector as? DefaultTrackSelector
+                                            if (trackSelector != null) {
+                                                val builder = trackSelector.buildUponParameters()
+                                                    .setOverrideForType(
+                                                        TrackSelectionOverride(group.mediaTrackGroup, i)
+                                                    )
+                                                trackSelector.setParameters(builder)
+                                            }
+                                            showSubtitleSheet = false
+                                        }
+                                    ) {
+                                        Text(
+                                            text = "$trackTypeStr: $trackName",
+                                            color = if (isSelected) Color.Red else Color.White
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
                 }
             }
