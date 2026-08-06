@@ -1,16 +1,4 @@
-# 🎬 Alpha Player
-
-<p align="center">
-  <img src="screenshots/banner.png" alt="Alpha Player Banner" width="100%">
-</p>
-
-<p align="center">
-  <strong>A modern Android Media Player built with Kotlin, Jetpack Compose, Firebase, and Media3 (ExoPlayer).</strong>
-</p>
-
-<p align="center">
-  Fast • Modern • Secure • Material 3 • MVVM Architecture
-</p>
+ # 🎬 Alpha Player
 
 ---
 
@@ -45,7 +33,7 @@ The application follows Google's recommended Android architecture using MVVM, Je
 ## 🛠 Tech Stack
 
 | Technology | Description |
-|------------|-------------|
+| ---------- | ----------- |
 | Kotlin | Programming Language |
 | Jetpack Compose | Modern Android UI Toolkit |
 | Material 3 | UI Design System |
@@ -60,42 +48,27 @@ The application follows Google's recommended Android architecture using MVVM, Je
 ---
 
 ## 🏗 Architecture
+    │
 
-```
-Presentation (Jetpack Compose)
+ ViewModel
+   (MVVM)
 
-        │
-
-     ViewModel
-      (MVVM)
-
-        │
-
-   Repository Layer
-
-        │
-
-Firebase / Remote API
-        │
-   M3U / JSON Data
-```
-
----
-
+    │
+    │
+    │
+   ---
 ## 📂 Project Structure
-
-```
 app
 │
 ├── data
-│   ├── model
-│   ├── repository
-│   └── parser
+│ ├── model
+│ ├── repository
+│ └── parser
 │
 ├── ui
-│   ├── screens
-│   ├── components
-│   └── theme
+│ ├── screens
+│ ├── components
+│ └── theme
 │
 ├── navigation
 │
@@ -104,19 +77,44 @@ app
 ├── utils
 │
 └── MainActivity.kt
-```
 
 ---
 
-## 📸 Screenshots
+# 📸 Screenshots
 
-| Splash | Login | Home |
-|--------|-------|------|
-| Add Screenshot | Add Screenshot | Add Screenshot |
+## 🔐 Login Screen
 
-| Movies | Player | Profile |
-|--------|---------|---------|
-| Add Screenshot | Add Screenshot | Add Screenshot |
+![Login Screen](https://raw.githubusercontent.com/suryakushwaha3/Alpha_Player/446a196300e91ef2c12483593f391d72ebdb6b29/login%20page.png)
+
+---
+
+## 📝 Sign Up Screen
+
+![Sign Up Screen](https://raw.githubusercontent.com/suryakushwaha3/Alpha_Player/446a196300e91ef2c12483593f391d72ebdb6b29/sign_page.png)
+
+---
+
+## 🏠 Home Screen
+
+![Home Screen](https://raw.githubusercontent.com/suryakushwaha3/Alpha_Player/446a196300e91ef2c12483593f391d72ebdb6b29/HomeScreen.png)
+
+---
+
+## 👤 Profile Screen
+
+![Profile Screen](https://raw.githubusercontent.com/suryakushwaha3/Alpha_Player/446a196300e91ef2c12483593f391d72ebdb6b29/profileScreen.png)
+
+---
+
+## 🎬 Movies Screen
+
+![Movies Screen](Add_Movies_Screenshot_Link)
+
+---
+
+## ▶️ Player Screen
+
+![Player Screen](Add_Player_Screenshot_Link)
 
 ---
 
@@ -125,86 +123,62 @@ app
 ### Clone Repository
 
 ```bash
-https://github.com/suryakushwaha3/Alpha_Player
-```
-
-### Open Project
+git clone https://github.com/suryakushwaha3/Alpha_Player.git
+Open Project
 
 Open the project in Android Studio.
 
-### Firebase Setup
-
-1. Create a Firebase Project.
-2. Enable Authentication.
-3. Enable Cloud Firestore.
-4. Download `google-services.json`.
-5. Place it inside the `app/` folder.
-
-### Run
+Firebase Setup
+Create a Firebase Project.
+Enable Authentication.
+Enable Cloud Firestore.
+Download google-services.json.
+Place it inside the app/ folder.
+Run
 
 Build and run the application on an Android device or emulator.
 
----
-
-## 📋 Requirements
-
-- Android Studio (Latest Stable)
-- Android SDK 24+
-- Kotlin
-- JDK 17+
-- Firebase Project
-
----
-
-## 📦 Main Dependencies
-
-- Jetpack Compose
-- Material 3
-- Firebase Authentication
-- Cloud Firestore
-- Media3 (ExoPlayer)
-- Coil
-- Navigation Compose
-- Kotlin Coroutines
-
----
-
-## 🎯 Future Improvements
-
-- Download Manager
-- Offline Playback
-- Chromecast Support
-- Continue Watching
-- Favorites Sync
-- Advanced Search Filters
-- Subtitle Support
-- Picture-in-Picture (PiP)
-- Multiple Playlist Support
-
----
-
-## 🤝 Contributing
+📋 Requirements
+Android Studio (Latest Stable)
+Android SDK 24+
+Kotlin
+JDK 17+
+Firebase Project
+📦 Main Dependencies
+Jetpack Compose
+Material 3
+Firebase Authentication
+Cloud Firestore
+Media3 (ExoPlayer)
+Coil
+Navigation Compose
+Kotlin Coroutines
+🎯 Future Improvements
+Download Manager
+Offline Playback
+Chromecast Support
+Continue Watching
+Favorites Sync
+Advanced Search Filters
+Subtitle Support
+Picture-in-Picture (PiP)
+Multiple Playlist Support
+🤝 Contributing
 
 Contributions, issues, and feature requests are welcome.
 
 If you'd like to improve the project, feel free to fork the repository and submit a pull request.
 
----
-
-## 📄 License
+📄 License
 
 This project is licensed under the MIT License.
 
----
+👨‍💻 Developer
 
-## 👨‍💻 Developer
-
-**Alpha Player**
+Alpha Player
 
 Android Developer
 
 Kotlin • Jetpack Compose • Firebase • Media3 • MVVM
-
----
 
 ⭐ If you like this project, don't forget to give it a Star!
