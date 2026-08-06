@@ -33,7 +33,7 @@ The application follows Google's recommended Android architecture using MVVM, Je
 ## 🛠 Tech Stack
 
 | Technology | Description |
-| ---------- | ----------- |
+|------------|-------------|
 | Kotlin | Programming Language |
 | Jetpack Compose | Modern Android UI Toolkit |
 | Material 3 | UI Design System |
@@ -48,27 +48,44 @@ The application follows Google's recommended Android architecture using MVVM, Je
 ---
 
 ## 🏗 Architecture
-    │
 
- ViewModel
-   (MVVM)
+```
+Presentation (Jetpack Compose)
 
-    │
-    │
-    │
-   ---
+          │
+
+       ViewModel
+          │
+        MVVM
+          │
+
+   Repository Layer
+
+          │
+
+ Firebase / Remote API
+
+          │
+
+     M3U / JSON Data
+```
+
+---
+
 ## 📂 Project Structure
+
+```
 app
 │
 ├── data
-│ ├── model
-│ ├── repository
-│ └── parser
+│   ├── model
+│   ├── repository
+│   └── parser
 │
 ├── ui
-│ ├── screens
-│ ├── components
-│ └── theme
+│   ├── screens
+│   ├── components
+│   └── theme
 │
 ├── navigation
 │
@@ -77,6 +94,7 @@ app
 ├── utils
 │
 └── MainActivity.kt
+```
 
 ---
 
@@ -118,67 +136,91 @@ app
 
 ---
 
-## 🚀 Getting Started
+# 🚀 Getting Started
 
-### Clone Repository
+## Clone Repository
 
 ```bash
 git clone https://github.com/suryakushwaha3/Alpha_Player.git
-Open Project
+```
+
+## Open Project
 
 Open the project in Android Studio.
 
-Firebase Setup
-Create a Firebase Project.
-Enable Authentication.
-Enable Cloud Firestore.
-Download google-services.json.
-Place it inside the app/ folder.
-Run
+## Firebase Setup
+
+1. Create a Firebase Project.
+2. Enable Authentication.
+3. Enable Cloud Firestore.
+4. Download `google-services.json`.
+5. Place it inside the `app/` folder.
+
+## Run
 
 Build and run the application on an Android device or emulator.
 
-📋 Requirements
-Android Studio (Latest Stable)
-Android SDK 24+
-Kotlin
-JDK 17+
-Firebase Project
-📦 Main Dependencies
-Jetpack Compose
-Material 3
-Firebase Authentication
-Cloud Firestore
-Media3 (ExoPlayer)
-Coil
-Navigation Compose
-Kotlin Coroutines
-🎯 Future Improvements
-Download Manager
-Offline Playback
-Chromecast Support
-Continue Watching
-Favorites Sync
-Advanced Search Filters
-Subtitle Support
-Picture-in-Picture (PiP)
-Multiple Playlist Support
-🤝 Contributing
+---
+
+# 📋 Requirements
+
+- Android Studio (Latest Stable)
+- Android SDK 24+
+- Kotlin
+- JDK 17+
+- Firebase Project
+
+---
+
+# 📦 Main Dependencies
+
+- Jetpack Compose
+- Material 3
+- Firebase Authentication
+- Cloud Firestore
+- Media3 (ExoPlayer)
+- Coil
+- Navigation Compose
+- Kotlin Coroutines
+
+---
+
+# 🎯 Future Improvements
+
+- Download Manager
+- Offline Playback
+- Chromecast Support
+- Continue Watching
+- Favorites Sync
+- Advanced Search Filters
+- Subtitle Support
+- Picture-in-Picture (PiP)
+- Multiple Playlist Support
+
+---
+
+# 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome.
 
 If you'd like to improve the project, feel free to fork the repository and submit a pull request.
 
-📄 License
+---
+
+# 📄 License
 
 This project is licensed under the MIT License.
 
-👨‍💻 Developer
+---
 
-Alpha Player
+# 👨‍💻 Developer
+
+**Alpha Player**
 
 Android Developer
 
 Kotlin • Jetpack Compose • Firebase • Media3 • MVVM
+
+---
 
 ⭐ If you like this project, don't forget to give it a Star!
