@@ -144,7 +144,7 @@ app
 ## ▶️ Player Screen
 
 <p align="center">
-  <img src="screenshots/player.png" width="280" alt="Alpha Player Video Player Screen">
+  <img src="https://raw.githubusercontent.com/suryakushwaha3/Alpha_Player/e7da7f849832164a6816218fb1b6738078619a5d/moviescreen.png" width="400" alt="Alpha Player Video Player Screen">
 </p>
 
 ---
