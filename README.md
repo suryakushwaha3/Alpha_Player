@@ -120,7 +120,7 @@ app
 ## 🏠 Home Screen
 
 <p align="center">
-  <img src="screenshots/home.png" width="280" alt="Alpha Player Home Screen">
+  <img src="https://github.com/suryakushwaha3/Alpha_Player/blob/master/HomeScreen.png?raw=true" width="280" alt="Alpha Player Home Screen">
 </p>
 
 ---
