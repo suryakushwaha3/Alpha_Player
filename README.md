@@ -112,7 +112,7 @@ app
 ## 📝 Sign Up Screen
 
 <p align="center">
-  <img src="screenshots/signup.png" width="280" alt="Alpha Player Sign Up Screen">
+  <img src="https://github.com/suryakushwaha3/Alpha_Player/blob/master/sign_page.png?raw=true" width="280" alt="Alpha Player Sign Up Screen">
 </p>
 
 ---
