@@ -136,7 +136,7 @@ app
 ## 🎬 Movies Screen
 
 <p align="center">
-  <img src="screenshots/movies.png" width="280" alt="Alpha Player Movies Screen">
+  <img src="https://raw.githubusercontent.com/suryakushwaha3/Alpha_Player/e7da7f849832164a6816218fb1b6738078619a5d/moviescreen.png" width="280" alt="Alpha Player Movies Screen">
 </p>
 
 ---
