@@ -104,7 +104,7 @@ app
 ## 🔐 Login Screen
 
 <p align="center">
-  <img src="screenshots/login.png" width="280" alt="Alpha Player Login Screen">
+  <img src="https://github.com/suryakushwaha3/Alpha_Player/blob/master/login%20page.png?raw=true" width="280" alt="Alpha Player Login Screen">
 </p>
 
 ---
