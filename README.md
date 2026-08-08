@@ -128,7 +128,7 @@ app
 ## 👤 Profile Screen
 
 <p align="center">
-  <img src="screenshots/profile.png" width="280" alt="Alpha Player Profile Screen">
+  <img src="https://github.com/suryakushwaha3/Alpha_Player/blob/master/profileScreen.png?raw=true" width="280" alt="Alpha Player Profile Screen">
 </p>
 
 ---
